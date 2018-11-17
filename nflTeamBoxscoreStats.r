@@ -1,10 +1,13 @@
 library(tidyverse)
-test_df <- tibble(x = 1:3, y = list(1:5, 1:10, 1:20))
-test_df
 
 ## Load the data
 nfl2018 <- read.csv("nflBoxscoreScrape2018.csv",stringsAsFactors = FALSE)
 schedule2018 <- read.csv("2018_schedule_single.csv",stringsAsFactors = FALSE)
+
+# use a tibble - https://cran.r-project.org/web/packages/tibble/vignettes/tibble.html
+sched_2018_tib <- read_csv("2018_schedule_single.csv")
+str(sched_2018_tib); glimpse(sched_2018_tib)
+class(sched_2018_tib[1]); class(sched_2018_tib[[1]]) # notice subsetting
 
 snapcounts2018 <- data.frame(read.csv("nflSnapCount2018.csv",stringsAsFactors = FALSE))
 
@@ -23,6 +26,7 @@ nfl2018$X1st.Downs <- as.numeric(X1st.Downs)
 nfl2018$Rushing <- as.numeric(Rushing)
 nfl2018$Passing <- as.numeric(Passing)
 nfl2018$Penalty <- as.numeric(Penalty)
+
 #Test below completion-attempt
 nfl2018$rdDwnCon <- as.numeric(regmatches(X3rd.Down.Conv,regexpr('\\d+',X3rd.Down.Conv)))
 nfl2018$rdDwnAtt <- abs(as.numeric(regmatches(X3rd.Down.Conv,regexpr('\\-\\d+',X3rd.Down.Conv))))
@@ -86,6 +90,10 @@ nfl2018$GTGAtt <- as.numeric(regmatches(Goal.to.Go.Eff.,regexpr('\\d+$',Goal.to.
 
 nfl2018$Safeties <- NULL
 
+# Look at data structure
+str(nfl2018)
+
+# Change column names
 colnames(nfl2018)[4] <- 'TOP'
 colnames(nfl2018)[5] <- 'FirstDowns'
 colnames(nfl2018)[6] <- 'FrstDwnRsh'
@@ -109,6 +117,7 @@ colnames(nfl2018)[21] <- 'IntLost'
 nfl2018$X3rd.Down.Conv <- NULL
 nfl2018$X4th.Down.Conv <- NULL
 nfl2018[20:26] <- NULL
+
 # home: TRUE/FALSE, if team has @ in front
 for (i in (1:nrow(nfl2018))) nfl2018$home[i] <- grepl(paste('@',nfl2018$Team[i],sep=''),nfl2018$Gm[i])
 
@@ -131,8 +140,10 @@ nfl2018 <- nfl2018[c("Week", "Gm", "Date", "home", "Team", "TOP",
                      "Ints", "IntReturnYds",
                      "Sacked", "SackYdsLost", "Penalties", "PenaltyYdsLost", 
                      "IntLost", "Fumbles", "FumblesLost", "Turnovers",
-                     "PuntReturns", "PuntReturnYds", "KickReturns", "KickReturnYds",
-                     "Kicking.XPMade", "Kicking.XPAtt", "Kicking.FGMade", "Kicking.FGAtt")]
+                     "PuntReturns", "PuntReturnYds",
+                     "KickReturns", "KickReturnYds",
+                     "Kicking.XPMade", "Kicking.XPAtt", 
+                     "Kicking.FGMade", "Kicking.FGAtt")]
 
 #Inverse-Allowed
 # High level approach: 1. Create field "Opponent" for each team for a given week (each row).
@@ -167,3 +178,4 @@ colnames(nfl2018) <- c('Week', 'Team', 'Gm', 'Date', 'home', 'TOP', 'TotalPlays'
                        'FumblesForced', 'FumblesRecovered', 'TurnoversForced', 'Punts', 
                        'PuntReturnYdsAllowed', 'KickOffs', 'KickReturnYdsAllowed', 'Kicking.XPAllowed', 
                        'Kicking.XPDefended', 'Kicking.FGAllowed', 'Kicking.FGDefended')
+str(nfl2018)
